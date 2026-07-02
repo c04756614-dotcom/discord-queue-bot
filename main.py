@@ -4,6 +4,7 @@ import os
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.guilds = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
@@ -17,7 +18,6 @@ async def on_ready():
 async def join(ctx):
     user = ctx.author
 
-    # prevent double-queue
     if user in queue:
         await ctx.send("You're already in queue.")
         return
@@ -25,7 +25,6 @@ async def join(ctx):
     queue.append(user)
     await ctx.send(f"{user.name} joined the queue. Waiting for opponent...")
 
-    # if 2 players, create match
     if len(queue) >= 2:
         p1 = queue.pop(0)
         p2 = queue.pop(0)
@@ -59,5 +58,9 @@ async def leave(ctx):
     else:
         await ctx.send("You're not in queue.")
 
-# TOKEN comes from Railway/Render environment variables
-bot.run(os.getenv("TOKEN"))
+token = os.getenv("TOKEN")
+
+if not token:
+    print("ERROR: TOKEN not found in environment variables")
+else:
+    bot.run(token)
